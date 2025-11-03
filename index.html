@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Такси квиз - Германски јазик</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+        }
+        
+        .instructions {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+        
+        .question {
+            margin-bottom: 20px;
+            padding: 18px;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            background-color: #fafbfc;
+            transition: all 0.3s ease;
+        }
+        
+        .question:hover {
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
+        
+        .question-number {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            font-size: clamp(1rem, 3vw, 1.1rem);
+        }
+        
+        .question-text {
+            margin-bottom: 15px;
+            font-style: italic;
+            color: #34495e;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            line-height: 1.5;
+        }
+        
+        .options {
+            margin-left: 5px;
+        }
+        
+        .option {
+            margin-bottom: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .option:last-child {
+            border-bottom: none;
+        }
+        
+        .option label {
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            line-height: 1.4;
+        }
+        
+        .option input {
+            margin-right: 12px;
+            margin-top: 3px;
+            transform: scale(1.2);
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .passed {
+            background-color: #d4f5e2;
+            border: 1px solid #a3e4bc;
+            color: #155724;
+        }
+        
+        .failed {
+            background-color: #fadbd8;
+            border: 1px solid #f5b7b1;
+            color: #721c24;
+        }
+        
+        .wrong-answers {
+            margin-top: 20px;
+        }
+        
+        .wrong-answer {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+        }
+        
+        button {
+            display: block;
+            margin: 30px auto;
+            padding: 14px 35px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            font-weight: bold;
+            transition: background-color 0.3s;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .progress {
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .stat-box {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            text-align: center;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        /* Медија queries за различни екрани */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .question {
+                padding: 15px;
+            }
+            
+            .option label {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .option input {
+                margin-bottom: 5px;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+            
+            .stat-box {
+                min-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 12px;
+            }
+            
+            .question {
+                padding: 12px;
+            }
+            
+            .results {
+                padding: 15px;
+            }
+            
+            .wrong-answer {
+                padding: 12px;
+            }
+            
+            button {
+                padding: 12px 25px;
+            }
+        }
+        
+        /* Додадени стилови за подобар приказ на мобилни уреди */
+        .mobile-optimized .option label {
+            padding: 8px 0;
+        }
+        
+        .mobile-optimized .question-text {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Такси квиз - Германски јазик</h1>
+        
+        <div class="instructions">
+            <p><strong>Упатство:</strong> Одберете го точниот одговор за секој од 27-те прашања. На крајот, кликнете на копчето "Провери ги одговорите" за да ги видите резултатите.</p>
+            <p><strong>Критериум за полагање:</strong> Може да имате најмногу 3 грешки за да го положите тестот.</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value" id="total-questions">27</div>
+                <div class="stat-label">Вкупно прашања</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="answered-questions">0</div>
+                <div class="stat-label">Одговорени</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Макс. грешки</div>
+            </div>
+        </div>
+        
+        <div class="progress">Прашања: 1-27</div>
+        
+        <form id="quiz-form">
+            <!-- Прашањата ќе се вметнат овде автоматски -->
+        </form>
+        
+        <button onclick="checkAnswers()">Провери ги одговорите</button>
+        
+        <div id="results" class="results">
+            <h2>Резултати</h2>
+            <p id="score-text"></p>
+            <p id="pass-fail-text"></p>
+            <div id="wrong-answers" class="wrong-answers"></div>
+        </div>
+    </div>
+
+    <script>
+        // Податоци за квизот - прашања и одговори
+        const quizData = [
+            {
+                question: "Selbständig erwerbende Taxichauffeure können selbständig entscheiden, ob sie während der Arbeitszeit alkoholische Getränke zu sich nehmen wollen",
+                options: {
+                    A: "Selbständig erwerbende Taxichauffeure können selbständig entscheiden, ob sie während der Arbeitszeit alkoholische Getränke zu sich nehmen wollen",
+                    B: "Es ist allen Taxichauffeuren verboten, während der Arbeitszeit alkoholische Getränke zu sich zu nehmen",
+                    C: "Selbständig erwerbende Taxichauffeure dürfen während der Arbeitszeit alkoholische Getränke genießen, Arbeitnehmer nur mit Einwilligung des Arbeitgebers"
+                }
+            },
+            {
+                question: "Der ARV 2 unterstehen vor allem Arbeitnehmer. Selbständigerwerbende unterstehen ihr nur, wenn sie regelmäßig Personentransporte ausführen",
+                options: {
+                    A: "Der ARV 2 unterstehen vor allem Arbeitnehmer. Selbständigerwerbende unterstehen ihr nur, wenn sie regelmäßig Personentransporte ausführen",
+                    B: "Nur Arbeitnehmer, nicht aber Selbständigerwerbende, unterstehen der ARV 2",
+                    C: "Der ARV 2 unterstehen sowohl Arbeitnehmer als auch Selbständigerwerbende"
+                }
+            },
+            {
+                question: "Die maximal zulässige tägliche Lenkzeit beträgt 9 Stunden",
+                options: {
+                    A: "Die maximal zulässige tägliche Lenkzeit beträgt 9 Stunden",
+                    B: "Die maximal zulässige tägliche Lenkzeit beträgt 10 Stunden",
+                    C: "Die maximal zulässige tägliche Lenkzeit beträgt 11 Stunden"
+                }
+            },
+            {
+                question: "Die Lenkzeit pro Woche beträgt höchstens 45 Stunden. Bei saisonalen Bedürfnissen darf sie um 3 Stunden Oberschritten werden",
+                options: {
+                    A: "Die Lenkzeit pro Woche beträgt höchstens 45 Stunden. Bei saisonalen Bedürfnissen darf sie um 3 Stunden Oberschritten werden",
+                    B: "Die Lenkzeit pro Woche beträgt höchstens 45 Stunden. Sie darf nicht oberschritten werden",
+                    C: "Die Lenkzeit pro Woche beträgt höchstens 45 Stunden, Sie darf oberschritten werden, wenn die pro Woche maximal zulässige Arbeitszeit eingehalten wird"
+                }
+            },
+            {
+                question: "Nach einer Lenkzeit von 4 1/2 Stunden muss eine Lenkpause von mindestens 15 Minuten eingelegt werden",
+                options: {
+                    A: "Nach einer Lenkzeit von 4 1/2 Stunden muss eine Lenkpause von mindestens 15 Minuten eingelegt werden",
+                    B: "Nach einer Lenkzeit von 4 1/2 Stunden muss eine Lenkpause von mindestens 45 Minuten eingelegt werden",
+                    C: "Nach einer Lenkzeit von 4 1/2 Stunden muss eine Lenkpause von mindestens 30 Minuten eingelegt werden"
+                }
+            },
+            {
+                question: "Nach 4 1/2 Stunden Lenkzeit muss keine Pause von 45 Minuten eingehalten werden, wenn anschließend die tägliche oder wöchentliche Ruhezeit beginnt",
+                options: {
+                    A: "Nach 4 1/2 Stunden Lenkzeit muss keine Pause von 45 Minuten eingehalten werden, wenn anschließend die tägliche oder wöchentliche Ruhezeit beginnt",
+                    B: "Nach 4 1/2 Stunden Lenkzeit ist eine Pause von 45 Minuten einzuhalten, auch wenn anschließend die tägliche oder wöchentliche Ruhezeit beginnt",
+                    C: "Nach 4 1/2 Stunden Lenkzeit muss eine Pause von 45 Minuten nur dann eingehalten werden, wenn die anschließende tägliche oder wöchentliche Ruhezeit verkürzt ist"
+                }
+            },
+            {
+                question: "Wenn die Lenkpause unterteilt wird, genügen vier Pausen von je 10 Minuten",
+                options: {
+                    A: "Wenn die Lenkpause unterteilt wird, genügen vier Pausen von je 10 Minuten",
+                    B: "Pausen von je 10 Minuten bei Unterteilung der Lenkpause genügen, wenn diese innerhalb 4 ½ Stunden Lenkzeit bezogen werden",
+                    C: "Wenn die Lenkpause unterteilt wird, sind zwei Pausen von mindestens je 20 Minuten erforderlich"
+                }
+            },
+            {
+                question: "Als Arbeitszeit gilt auch die bloße Präsenzzeit",
+                options: {
+                    A: "Als Arbeitszeit gilt auch die bloße Präsenzzeit",
+                    B: "Die bloße Präsenzzeit gilt nicht als Arbeitszeit",
+                    C: "Nur wenn die Präsenzzeit länger als 15 Minuten dauert, gilt sie als Arbeitszeit"
+                }
+            },
+            {
+                question: "Für den Arbeitnehmer setzt sich die Arbeitszeit zusammen aus der Arbeits- und Ruhezeit sowie den Pausen",
+                options: {
+                    A: "Für den Arbeitnehmer setzt sich die Arbeitszeit zusammen aus der Arbeits- und Ruhezeit sowie den Pausen",
+                    B: "Für den Arbeitnehmer gilt nur die Lenkzeit als Arbeitszeit",
+                    C: "Für den Arbeitnehmer gilt die gesamte Zeit, während der er sich zur Verfügung des Arbeitgebers halten muss, als Arbeitszeit"
+                }
+            },
+            {
+                question: "Die wöchentliche Höchstarbeitszeit ohne Überzeit beträgt 48 Stunden und in Taxibetrieben 53 Stunden",
+                options: {
+                    A: "Die wöchentliche Höchstarbeitszeit ohne Überzeit beträgt 48 Stunden und in Taxibetrieben 53 Stunden",
+                    B: "Die wöchentliche Höchstarbeitszeit ohne Überzeit beträgt 46 Stunden",
+                    C: "Die wöchentliche Höchstarbeitszeit ohne Überzeit beträgt 56 Stunden"
+                }
+            },
+            {
+                question: "Die wöchentliche Höchstarbeitszeit darf bei normalen Betriebsbedürfnissen um 4 Stunden oberschritten werden.",
+                options: {
+                    A: "Die wöchentliche Höchstarbeitszeit darf bei normalen Betriebsbedürfnissen um 4 Stunden oberschritten werden.",
+                    B: "Die wöchentliche Höchstarbeitszeit darf bei normalen Betriebsbedürfnissen um 5 Stunden überschritten werden",
+                    C: "Die wöchentliche Höchstarbeitszeit darf bei normalen Betriebsbedürfnissen um 6 Stunden überschritten werden"
+                }
+            },
+            {
+                question: "in einem Kalenderjahr dürfen insgesamt höchstens 250 Überstunden geleistet werden",
+                options: {
+                    A: "in einem Kalenderjahr dürfen insgesamt höchstens 250 Überstunden geleistet werden",
+                    B: "In einem Kalenderjahr dürfen insgesamt höchstens 208 Überstunden geleistet werden",
+                    C: "In einem Kalenderjahr dürfen insgesamt höchstens 150 Überstunden geleistet werden"
+                }
+            },
+            {
+                question: "Bei vorübergehenden, außerordentlichen Betriebsbedürfnissen (zum Beispiel saisonale Schwankungen) sind pro Woche maximal 4 Oberstunden zulässig",
+                options: {
+                    A: "Bei vorübergehenden, außerordentlichen Betriebsbedürfnissen (zum Beispiel saisonale Schwankungen) sind pro Woche maximal 4 Oberstunden zulässig",
+                    B: "Bei vorübergehenden, außerordentlichen Betriebsbedürfnissen (zum Beispiel saisonale Schwankungen) sind pro Woche maximal 6 Überstunden zulässig",
+                    C: "Bei vorübergehenden, außerordentlichen Betriebsbedürfnissen (zum Beispiel saisonale Schwankungen) sind pro Woche maximal 8 Oberstunden zulässig"
+                }
+            },
+            {
+                question: "Der Arbeitnehmer muss spätestens nach 4 1/2 Stunden Arbeitszeit eine Arbeitspause einlegen",
+                options: {
+                    A: "Der Arbeitnehmer muss spätestens nach 4 1/2 Stunden Arbeitszeit eine Arbeitspause einlegen",
+                    B: "Der Arbeitnehmer muss spätestens nach 5 1/2 Stunden Arbeitszeit eine Arbeitspause einlegen",
+                    C: "Der Arbeitnehmer muss spätestens nach 3 1/2 Stunden Arbeitszeit eine Arbeitspause einlegen"
+                }
+            },
+            {
+                question: "Wird eine Arbeitspause unterteilt, so muss jeder Teil mindestens 10 Minuten betragen",
+                options: {
+                    A: "Wird eine Arbeitspause unterteilt, so muss jeder Teil mindestens 10 Minuten betragen",
+                    B: "Wird eine Arbeitspause unterteilt, so muss jeder Teil mindestens.15 Minuten betragen",
+                    C: "Wird eine Arbeitspause unterteilt, so muss jeder Teil mindestens 20 Minuten betragen"
+                }
+            },
+            {
+                question: "Bei einer täglichen Arbeitszeit von 6 Stunden muss die Arbeitspause mindestens 30 Minuten betragen",
+                options: {
+                    A: "Bei einer täglichen Arbeitszeit von 6 Stunden muss die Arbeitspause mindestens 30 Minuten betragen",
+                    B: "Bei einer täglichen Arbeitszeit von 6 Stunden muss die Arbeitspause mindestens 20 Minuten betragen",
+                    C: "Bei einer täglichen Arbeitszeit von 6 Stunden muss die Arbeitspause mindestens 25 Minuten betragen"
+                }
+            },
+            {
+                question: "Bei einer täglichen Arbeitszeit von 8 Stunden muss die nicht unterteilte Arbeitspause mindestens 35 Minuten betragen",
+                options: {
+                    A: "Bei einer täglichen Arbeitszeit von 8 Stunden muss die nicht unterteilte Arbeitspause mindestens 35 Minuten betragen",
+                    B: "Bei einer täгlichen Arbeitszeit von 8 Stunden muss die nicht unterteilte Arbeitspause mindestens 30 Minuten betragen",
+                    C: "Bei einer täglichen Arbeitszeit von 8 Stunden muss die nicht unterteilte Arbeitspause mindestens 40 Minuten betragen"
+                }
+            },
+            {
+                question: "Bei einer täglichen Arbeitszeit von 10 Stunden kann die Arbeitspause in viermal 15 Minuten aufgeteilt werden",
+                options: {
+                    A: "Bei einer täglichen Arbeitszeit von 10 Stunden kann die Arbeitspause in viermal 15 Minuten aufgeteilt werden",
+                    B: "Bei einer täglichen Arbeitszeit von 10 Stunden kann die Arbeitspause in einmal 30 und dreimal 10 Minuten aufgeteilt werden",
+                    C: "Bei einer täglichen Arbeitszeit von 10 Stunden kann die Arbeitspause in dreimal 20 Minuten aufgeteilt werden"
+                }
+            },
+            {
+                question: "Unterteilt der Arbeitnehmer seine Arbeitspause, so darf er zwischen den Teilpausen höchstens 6 1/2 Stunden arbeiten",
+                options: {
+                    A: "Unterteilt der Arbeitnehmer seine Arbeitspause, so darf er zwischen den Teilpausen höchstens 6 1/2 Stunden arbeiten",
+                    B: "Unterteilt der Arbeitnehmer seine Arbeitspause, so darf er между den Teilpausen höchstens 6 Stunden arbeiten",
+                    C: "Unterteilt der Arbeitnehmer seine Arbeitspause, so darf er zwischen den Teilpausen höchstens 5 1/2 Stunden arbeiten"
+                }
+            },
+            {
+                question: "Die tägliche, nicht verkürzte Ruhezeit muss mindestens 11 Stunden betragen",
+                options: {
+                    A: "Die tägliche, nicht verkürzte Ruhezeit muss mindestens 11 Stunden betragen",
+                    B: "Die tägliche, nicht verkürzte Ruhezeit muss mindestens 8 Stunden betragen",
+                    C: "Die tägliche, nicht verkürzte Ruhezeit muss mindestens 9 Stunden betragen"
+                }
+            },
+            {
+                question: "Für Arbeitnehmer muss der wöchentliche Ruhetag ohne Berücksichtigung der täglichen Ruhezeit mindestens 24 Stunden betragen.",
+                options: {
+                    A: "Für Arbeitnehmer muss der wöchentliche Ruhetag ohne Berücksichtigung der täglichen Ruhezeit mindestens 24 Stunden betragen.",
+                    B: "Für Arbeitnehmer muss der wöchentliche Ruhetag ohne Berücksichtigung der täglichen Ruhezeit mindestens 30 Stunden betragen",
+                    C: "Für Arbeitnehmer muss der wöchentliche Ruhetag ohne Berücksichtigung der täglichen Ruhezeit mindestens 18 Stunden betrage"
+                }
+            },
+            {
+                question: "Im Einverständnis mit dem Arbeitgeber kann der Arbeitnehmer die wöchentlichen freien Halbtage von maximal 2 aufeinander folgenden Wochen zusammenhängend beziehen",
+                options: {
+                    A: "Im Einverständnis mit dem Arbeitgeber kann der Arbeitnehmer die wöchentlichen freien Halbtage von maximal 2 aufeinander folgenden Wochen zusammenhängend beziehen",
+                    B: "Im Einverständnis mit dem Arbeitgeber kann der Arbeitnehmer die wöchentlichen freien Halbtage von maximal 6 aufeinander folgenden Wochen zusammenhängend beziehen",
+                    C: "Im Einverständnis mit dem Arbeitgeber kann der Arbeitnehmer die wöchentlichen freien Halbtage von maximal 4 aufeinander folgenden Wochen zusammenhängend beziehen"
+                }
+            },
+            {
+                question: "Es gibt keine Vorschriften über handschriftliche Eintragungen auf dem Einlageblatt",
+                options: {
+                    A: "Es gibt keine Vorschriften über handschriftliche Eintragungen auf dem Einlageblatt",
+                    B: "Handschriftliche Eintragungen auf dem Einlageblatt sind nicht gestattet",
+                    C: "Bei handschriftlichen Eintragungen auf dem Einlageblatt ist besonders zu beachten, dass die Eintragungen lesbar sind"
+                }
+            },
+            {
+                question: "Der Fahrtschreiber muss lediglich auf Lenkzeit geschaltet werden",
+                options: {
+                    A: "Der Fahrtschreiber muss lediglich auf Lenkzeit geschaltet werden",
+                    B: "Der Fahrtschreiber ist so zu bedienen, dass die Lenkzeit, die übrige Arbeitszeit und die Pausen richtig aufgezeichnet werden",
+                    C: "Der Fahrtschreiber funktioniert automatisch und benötigt keine Bedienung"
+                }
+            },
+            {
+                question: "Die Verpflichtung, leere Einlageblätter mitzuführen, besteht nur wenn das Fahrzeug mit einem Einträge-Fahrtschreiber ausgerüstet ist",
+                options: {
+                    A: "Die Verpflichtung, leere Einlageblätter mitzuführen, besteht nur wenn das Fahrzeug mit einem Einträge-Fahrtschreiber ausgerüstet ist",
+                    B: "ES besteht keine Verpflichtung, leere Einlageblätter mitzuführen: die im Fahrtschreiber eingelegten Blatter genügen",
+                    C: "Der Führer ist verpflichtet, stets genügend leere Einlageblätter mitzuführen"
+                }
+            },
+            {
+                question: "Der Fahrer muss den Fahrtschreiber in Betrieb halten, wenn er sich während seiner beruflichen Tätigkeit außerhalb des Fahrzeuges, aber in dessen Nähe befindet",
+                options: {
+                    A: "Der Fahrer muss den Fahrtschreiber in Betrieb halten, wenn er sich während seiner beruflichen Tätigkeit außerhalb des Fahrzeuges, aber in dessen Nähe befindet",
+                    B: "Der Fahrer muss den Fahrtschreiber nicht in Betrieb halten, wenn er sich während seiner beruflichen Tätigkeit außerhalb des Fahrzeuges, aber in dessen Nähe befindet",
+                    C: "Der Arbeitgeber bestimmt, ob der Fahrer den Fahrtschreiber in Betrieb halten muss, wenn er sich während seiner beruflichen Tätigkeit außerhalb des Fahrzeuges, aber in dessen Nähe befindet"
+                }
+            },
+            {
+                question: "Es ist nicht zulässig, dass zwei Fahrzeugführer ein gemeinsames Arbeitsbuch führen",
+                options: {
+                    A: "Es ist nicht zulässig, dass zwei Fahrzeugführer ein gemeinsames Arbeitsbuch führen",
+                    B: "Innerhalb des gleichen Betriebes dürfen zwei Fahrzeugführer ein Arbeitsbuch führen, falls einer der beiden der Firmeninhaber ist",
+                    C: "Zwei Fahrzeugführer dürfen ein gemeinsames Arbeitsbuch führen, sofern sie nie gleichzeitig arbeiten"
+                }
+            }
+        ];
+
+        // Точни одговори според вашите податоци - прашање 10 е A
+        const correctAnswers = [
+            'B', 'C', 'A', 'B', 'B', 'A', 'C', 'A', 'C', 'A', // Прашање 10 е A
+            'A', 'B', 'B', 'B', 'C', 'B', 'B', 'C', 'C', 'A',
+            'A', 'C', 'C', 'B', 'C', 'A', 'A'
+        ];
+
+        // Функција за креирање на квизот
+        function createQuiz() {
+            const quizForm = document.getElementById('quiz-form');
+            
+            quizData.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `Прашање ${index + 1}:`;
+                
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = q.question;
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                for (const option in q.options) {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option';
+                    
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = `question-${index}`;
+                    radio.value = option;
+                    radio.id = `q${index}-${option}`;
+                    radio.addEventListener('change', updateAnsweredCount);
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `q${index}-${option}`;
+                    label.innerHTML = `<strong>${option}:</strong> ${q.options[option]}`;
+                    
+                    optionDiv.appendChild(radio);
+                    optionDiv.appendChild(label);
+                    optionsDiv.appendChild(optionDiv);
+                }
+                
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(questionText);
+                questionDiv.appendChild(optionsDiv);
+                quizForm.appendChild(questionDiv);
+            });
+            
+            // Додади класа за мобилна оптимизација
+            if (window.innerWidth <= 768) {
+                document.body.classList.add('mobile-optimized');
+            }
+        }
+
+        // Функција за ажурирање на бројачот на одговорени прашања
+        function updateAnsweredCount() {
+            let answeredCount = 0;
+            
+            for (let i = 0; i < quizData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="question-${i}"]:checked`);
+                if (selectedOption) {
+                    answeredCount++;
+                }
+            }
+            
+            document.getElementById('answered-questions').textContent = answeredCount;
+        }
+
+        // Функција за проверка на одговорите
+        function checkAnswers() {
+            let correctCount = 0;
+            let wrongCount = 0;
+            const wrongAnswersList = [];
+            
+            for (let i = 0; i < quizData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="question-${i}"]:checked`);
+                
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswers[i]) {
+                        correctCount++;
+                    } else {
+                        wrongCount++;
+                        wrongAnswersList.push({
+                            questionNumber: i + 1,
+                            selected: selectedOption.value,
+                            correct: correctAnswers[i],
+                            question: quizData[i].question,
+                            options: quizData[i].options
+                        });
+                    }
+                } else {
+                    wrongCount++;
+                    wrongAnswersList.push({
+                        questionNumber: i + 1,
+                        selected: 'Нема одговор',
+                        correct: correctAnswers[i],
+                        question: quizData[i].question,
+                        options: quizData[i].options
+                    });
+                }
+            }
+            
+            displayResults(correctCount, wrongCount, wrongAnswersList);
+        }
+
+        // Функција за приказ на резултатите
+        function displayResults(correct, wrong, wrongAnswers) {
+            const resultsDiv = document.getElementById('results');
+            const scoreText = document.getElementById('score-text');
+            const passFailText = document.getElementById('pass-fail-text');
+            const wrongAnswersDiv = document.getElementById('wrong-answers');
+            
+            scoreText.textContent = `Точни одговори: ${correct} | Погрешни одговори: ${wrong}`;
+            
+            if (wrong <= 3) {
+                passFailText.textContent = 'Честитки! Го поминавте тестот.';
+                resultsDiv.className = 'results passed';
+            } else {
+                passFailText.textContent = 'За жал, не го поминавте тестот. Можете да имате најмногу 3 грешки.';
+                resultsDiv.className = 'results failed';
+            }
+            
+            // Приказ на погрешни одговори
+            wrongAnswersDiv.innerHTML = '<h3>Погрешни одговори:</h3>';
+            
+            if (wrongAnswers.length > 0) {
+                wrongAnswers.forEach(item => {
+                    const wrongAnswerDiv = document.createElement('div');
+                    wrongAnswerDiv.className = 'wrong-answer';
+                    
+                    let correctOptionText = '';
+                    if (item.options && item.correct) {
+                        correctOptionText = item.options[item.correct];
+                    }
+                    
+                    wrongAnswerDiv.innerHTML = `
+                        <strong>Прашање ${item.questionNumber}:</strong><br>
+                        <em>${item.question}</em><br><br>
+                        <span style="color: #e74c3c;">Вашиот одговор: ${item.selected}</span><br>
+                        <span style="color: #27ae60;">Точниот одговор: ${item.correct} - ${correctOptionText}</span>
+                    `;
+                    
+                    wrongAnswersDiv.appendChild(wrongAnswerDiv);
+                });
+            } else {
+                wrongAnswersDiv.innerHTML += '<p>Немате погрешни одговори. Одлично!</p>';
+            }
+            
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Додади event listener за промена на големината на екранот
+        window.addEventListener('resize', function() {
+            if (window.innerWidth <= 768) {
+                document.body.classList.add('mobile-optimized');
+            } else {
+                document.body.classList.remove('mobile-optimized');
+            }
+        });
+
+        // Иницијализација на квизот кога се вчитува страницата
+        window.onload = createQuiz;
+    </script>
+</body>
+</html>
